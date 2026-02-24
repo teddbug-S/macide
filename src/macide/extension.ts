@@ -12,6 +12,8 @@ import { AccountRotator } from './auth/rotator';
 import { NotificationService } from './ui/notifications/notificationService';
 import { CredentialBridge } from './auth/credentialBridge';
 import { installHttpInterceptor, uninstallHttpInterceptor } from './auth/httpInterceptor';
+import { AccountPanelProvider } from './ui/accountPanel/accountPanelProvider';
+import { AccountStatusBar } from './ui/statusbar/accountStatusBar';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	// --- Core services ---
@@ -51,6 +53,35 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	rotator.resetDailyCountsIfNeeded();
 	const resetInterval = setInterval(() => rotator.resetDailyCountsIfNeeded(), 60 * 60 * 1000);
 
+	// --- Account Panel (M3 glassmorphic webview) ---
+	const accountPanel = new AccountPanelProvider(
+		context,
+		accountManager,
+		/* onAddAccount */    () => vscode.commands.executeCommand('macide.addAccount'),
+		/* onSwitchAccount */ async (id) => {
+			const target = accountManager.getAll().find(a => a.id === id);
+			if (target) await accountManager.setActive(target);
+		},
+		/* onRemoveAccount */ async (id) => {
+			await accountManager.removeAccountById(id);
+			notifications.info('Account removed.');
+		},
+		/* onRenameAccount */ async (id, alias) => {
+			const acc = accountManager.getAll().find(a => a.id === id);
+			if (acc) {
+				acc.alias = alias;
+				await accountManager.updateAccount(acc);
+			}
+		}
+	);
+
+	// --- Status bar account pill ---
+	const accountStatusBar = new AccountStatusBar(
+		accountManager,
+		'macide.openAccountPanel',
+		'macide.addAccount'
+	);
+
 	// --- Commands ---
 	context.subscriptions.push(
 		/**
@@ -72,19 +103,28 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		}),
 
 		vscode.commands.registerCommand('macide.openAccountPanel', () => {
-			// TODO M3: open glassmorphic account panel webview
-			vscode.window.showQuickPick(
-				accountManager.getAll().map(a => ({
-					label: a.alias,
-					description: `@${a.githubUsername}  •  ${a.id === accountManager.getActive()?.id ? 'Active' : a.status}`,
-					id: a.id
-				})),
-				{ placeHolder: 'Select GitHub account for Copilot' }
-			).then(async selected => {
-				if (!selected) return;
-				const account = accountManager.getAll().find(a => a.id === (selected as any).id);
-				if (account) await accountManager.setActive(account);
-			});
+			accountPanel.open();
+		}),
+
+		vscode.commands.registerCommand('macide.removeAccount', async () => {
+			const all = accountManager.getAll();
+			if (!all.length) {
+				notifications.info('No accounts to remove.');
+				return;
+			}
+			const selected = await vscode.window.showQuickPick(
+				all.map(a => ({ label: a.alias, description: `@${a.githubUsername}`, id: a.id })),
+				{ placeHolder: 'Select account to remove' }
+			);
+			if (!selected) return;
+			const confirmed = await vscode.window.showWarningMessage(
+				`Remove "${selected.label}" (@${selected.description?.replace('@','')})? The token will be deleted from the OS keychain.`,
+				{ modal: true }, 'Remove'
+			);
+			if (confirmed === 'Remove') {
+				await accountManager.removeAccountById((selected as any).id);
+				notifications.info(`Removed ${selected.label}.`);
+			}
 		}),
 
 		vscode.commands.registerCommand('macide.switchAccount', () => {
@@ -103,15 +143,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	);
 
 	// --- Cleanup ---
-	context.subscriptions.push({
-		dispose: () => {
-			clearInterval(resetInterval);
-			uninstallHttpInterceptor();
-			authProvider.dispose();
-			accountManager.dispose();
-			credentialBridge.dispose();
+	context.subscriptions.push(
+		accountPanel,
+		accountStatusBar,
+		{
+			dispose: () => {
+				clearInterval(resetInterval);
+				uninstallHttpInterceptor();
+				authProvider.dispose();
+				accountManager.dispose();
+				credentialBridge.dispose();
+			}
 		}
-	});
+	);
 }
 
 export function deactivate(): void {
