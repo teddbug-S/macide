@@ -1,11 +1,11 @@
 /*---------------------------------------------------------------------------------------------
  * Macide — Multi-Account Copilot IDE
- * Toast Notification Service — lightweight in-editor notifications for Macide events.
- * Full toast UI (glassmorphic pill) is implemented in M6.
- * For M1–M4 this wraps VS Code's built-in notification API.
+ * Notification Service — delegates to ToastService (M6) when initialised,
+ * falls back to VS Code's native notification API before M6 is wired.
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
+import type { ToastService } from '../toast/toastService';
 
 export interface ToastAction {
 	label: string;
@@ -13,10 +13,17 @@ export interface ToastAction {
 }
 
 export class NotificationService {
+	/** Injected by extension.ts after ToastService is constructed. */
+	toastService: ToastService | undefined;
+
 	info(message: string, action?: ToastAction): void {
+		if (this.toastService) {
+			this.toastService.info(message, action ? { label: action.label, callback: action.action } : undefined);
+			return;
+		}
 		if (action) {
-			vscode.window.showInformationMessage(`Macide: ${message}`, action.label).then(selection => {
-				if (selection === action.label) action.action();
+			vscode.window.showInformationMessage(`Macide: ${message}`, action.label).then(s => {
+				if (s === action.label) action.action();
 			});
 		} else {
 			vscode.window.showInformationMessage(`Macide: ${message}`);
@@ -24,9 +31,13 @@ export class NotificationService {
 	}
 
 	warning(message: string, action?: ToastAction): void {
+		if (this.toastService) {
+			this.toastService.warning(message, action ? { label: action.label, callback: action.action } : undefined);
+			return;
+		}
 		if (action) {
-			vscode.window.showWarningMessage(`Macide: ${message}`, action.label).then(selection => {
-				if (selection === action.label) action.action();
+			vscode.window.showWarningMessage(`Macide: ${message}`, action.label).then(s => {
+				if (s === action.label) action.action();
 			});
 		} else {
 			vscode.window.showWarningMessage(`Macide: ${message}`);
@@ -34,9 +45,13 @@ export class NotificationService {
 	}
 
 	error(message: string, action?: ToastAction): void {
+		if (this.toastService) {
+			this.toastService.error(message, action ? { label: action.label, callback: action.action } : undefined);
+			return;
+		}
 		if (action) {
-			vscode.window.showErrorMessage(`Macide: ${message}`, action.label).then(selection => {
-				if (selection === action.label) action.action();
+			vscode.window.showErrorMessage(`Macide: ${message}`, action.label).then(s => {
+				if (s === action.label) action.action();
 			});
 		} else {
 			vscode.window.showErrorMessage(`Macide: ${message}`);

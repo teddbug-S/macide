@@ -13,6 +13,23 @@
   "activationEvents": ["onStartupFinished"],
   "main": "./out/extension.js",
   "contributes": {
+    "themes": [
+      {
+        "label": "Obsidian Flow",
+        "uiTheme": "vs-dark",
+        "path": "./out/theme/obsidianFlow.json"
+      }
+    ],
+    "views": {
+      "panel": [
+        {
+          "type": "webview",
+          "id": "macide.toastView",
+          "name": "Macide Notifications",
+          "visibility": "collapsed"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "macide.addAccount",
@@ -37,6 +54,21 @@
       {
         "command": "macide.enterFlowMode",
         "title": "Macide: Enter Flow Mode",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.toggleFlowMode",
+        "title": "Macide: Toggle Flow Mode",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.openBranchSwitcher",
+        "title": "Macide: Switch Branch",
+        "category": "Macide"
+      },
+      {
+        "command": "macide._exitFlowModeEscape",
+        "title": "Macide: Exit Flow Mode (Escape)",
         "category": "Macide"
       },
       {
@@ -112,15 +144,24 @@
         "mac": "cmd+shift+a"
       },
       {
-        "command": "macide.switchAccount",
+        "command": "macide.openBranchSwitcher",
         "key": "ctrl+shift+b",
-        "mac": "cmd+shift+b",
-        "when": "false"
+        "mac": "cmd+shift+b"
       },
       {
         "command": "macide.enterFlowMode",
         "key": "ctrl+.",
         "mac": "cmd+."
+      },
+      {
+        "command": "macide.toggleFlowMode",
+        "key": "ctrl+.",
+        "mac": "cmd+."
+      },
+      {
+        "command": "macide._exitFlowModeEscape",
+        "key": "escape",
+        "when": "macide.flowMode"
       },
       {
         "command": "macide.openGitHistory",

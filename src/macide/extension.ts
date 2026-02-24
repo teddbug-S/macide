@@ -20,12 +20,20 @@ import { BlameAnnotationController } from './git/blameAnnotation';
 import { GitHistoryPanel } from './git/historyGraph';
 import { ConflictBarProvider, resolveConflict } from './git/conflictBar';
 import { StashManagerPanel } from './git/stashManager';
+// --- M6 UI Polish ---
+import { ToastService } from './ui/toast/toastService';
+import { BranchPill } from './ui/branchPill/branchPill';
+import { FlowModeController } from './ui/flowMode/flowModeController';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	// --- Core services ---
 	const notifications = new NotificationService();
 	const accountManager = new AccountManager(context);
 	await accountManager.load();
+
+	// M6 Toast Service — wire before anything that calls notifications
+	const toastService = new ToastService(context);
+	notifications.toastService = toastService;
 
 	const rotator = new AccountRotator(accountManager, notifications);
 	const tracker = new AccountTracker(accountManager, rotator, context);
@@ -266,6 +274,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		})
 	);
 
+	// ── M6: UI Polish ─────────────────────────────────────────────────────────
+
+	// Branch pill in status bar
+	const branchPill = new BranchPill();
+
+	// Flow Mode
+	const flowMode = new FlowModeController(context);
+	flowMode.restoreState();
+
+	context.subscriptions.push(
+		// Toggle flow mode (Cmd+.)
+		vscode.commands.registerCommand('macide.toggleFlowMode', () => flowMode.toggle()),
+		// enterFlowMode is the old alias kept for keybinding backward compat
+		vscode.commands.registerCommand('macide.enterFlowMode', () => flowMode.toggle()),
+		// Branch switcher
+		vscode.commands.registerCommand('macide.openBranchSwitcher', () => BranchPill.openBranchSwitcher()),
+	);
+
 	// --- Cleanup ---
 	context.subscriptions.push(
 		accountPanel,
@@ -274,6 +300,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		historyPanel,
 		conflictBar,
 		stashPanel,
+		branchPill,
+		flowMode,
+		toastService,
 		{
 			dispose: () => {
 				clearInterval(resetInterval);
