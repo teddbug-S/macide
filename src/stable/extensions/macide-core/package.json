@@ -21,6 +21,16 @@
       }
     ],
     "views": {
+      "explorer": [
+        {
+          "id": "macide.contextPinsView",
+          "name": "AI Context Pins",
+          "contextualTitle": "Macide Context Pins",
+          "icon": "$(pin)",
+          "visibility": "collapsed",
+          "when": "true"
+        }
+      ],
       "panel": [
         {
           "type": "webview",
@@ -135,8 +145,111 @@
         "command": "macide.checkCrossAccountRemote",
         "title": "Macide: Check Cross-Account Remote",
         "category": "Macide"
+      },
+      {
+        "command": "macide.inlineDiff.accept",
+        "title": "$(check) Accept AI Change",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.inlineDiff.acceptLine",
+        "title": "$(list-selection) Accept Current Line",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.inlineDiff.reject",
+        "title": "$(x) Reject AI Change",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.inlineDiff.openDiffEditor",
+        "title": "$(diff) Open in Diff Editor",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.showInlineDiffActions",
+        "title": "Macide: Review Inline AI Change",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.reviewInlineChange",
+        "title": "Macide: Mark Selection as AI Change",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.pinToAiContext",
+        "title": "$(pin) Pin to AI Context",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.unpinFromAiContext",
+        "title": "$(pinned-dirty) Remove Context Pin",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.toggleContextPin",
+        "title": "$(pin) Toggle Context Pin",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.clearContextPins",
+        "title": "$(clear-all) Clear All Context Pins",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.copyContextPins",
+        "title": "$(copy) Copy Context Pins to Clipboard",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.openFloatingChat",
+        "title": "$(comment-discussion) Open Macide AI Chat",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.showContextSuggestions",
+        "title": "$(zap) Show Context Suggestions",
+        "category": "Macide"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "macide.pinToAiContext",
+          "when": "editorFocus",
+          "group": "macide@1"
+        },
+        {
+          "command": "macide.reviewInlineChange",
+          "when": "editorHasSelection",
+          "group": "macide@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "macide.unpinFromAiContext",
+          "when": "view == macide.contextPinsView && viewItem == contextPin",
+          "group": "inline"
+        },
+        {
+          "command": "macide.toggleContextPin",
+          "when": "view == macide.contextPinsView && viewItem == contextPin",
+          "group": "inline"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "macide.clearContextPins",
+          "when": "view == macide.contextPinsView && macide.hasContextPins",
+          "group": "navigation"
+        },
+        {
+          "command": "macide.copyContextPins",
+          "when": "view == macide.contextPinsView && macide.hasContextPins",
+          "group": "navigation"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "macide.openAccountPanel",
@@ -182,6 +295,22 @@
         "command": "macide.openStashManager",
         "key": "ctrl+shift+g s",
         "mac": "cmd+shift+g s"
+      },
+      {
+        "command": "macide.openFloatingChat",
+        "key": "ctrl+shift+c",
+        "mac": "cmd+shift+c"
+      },
+      {
+        "command": "macide.pinToAiContext",
+        "key": "ctrl+shift+x",
+        "mac": "cmd+shift+x",
+        "when": "editorFocus"
+      },
+      {
+        "command": "macide.showContextSuggestions",
+        "key": "ctrl+shift+k",
+        "mac": "cmd+shift+k"
       }
     ],
     "configuration": {

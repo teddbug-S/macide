@@ -24,6 +24,12 @@ import { StashManagerPanel } from './git/stashManager';
 import { ToastService } from './ui/toast/toastService';
 import { BranchPill } from './ui/branchPill/branchPill';
 import { FlowModeController } from './ui/flowMode/flowModeController';
+// --- M7 Antigravity Features ---
+import { InlineDiffController } from './ui/inlineDiff/inlineDiffController';
+import { ContextPinsProvider } from './ui/contextPins/contextPinsProvider';
+import { FloatingChatPanel } from './ui/floatingChat/floatingChatPanel';
+import { SessionMemory } from './session/sessionMemory';
+import { ContextualSurface } from './ui/commandPalette/contextualSurface';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	// --- Core services ---
@@ -292,6 +298,53 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		vscode.commands.registerCommand('macide.openBranchSwitcher', () => BranchPill.openBranchSwitcher()),
 	);
 
+	// ── M7: Antigravity Features ──────────────────────────────────────────────
+
+	// Inline diff review controller
+	const inlineDiff = new InlineDiffController();
+
+	// Context pins tree view
+	const contextPins = new ContextPinsProvider(context);
+	context.subscriptions.push(
+		vscode.window.registerTreeDataProvider('macide.contextPinsView', contextPins)
+	);
+
+	// Floating AI chat panel (receives context pins for injecting as system context)
+	const floatingChat = new FloatingChatPanel(context, contextPins);
+
+	// Contextual command surfacing (surface relevant commands based on cursor / account state)
+	const contextualSurface = new ContextualSurface(
+		accountManager,
+		() => vscode.workspace.getConfiguration('macide').get<number>('accounts.assumedDailyLimit', 300)
+	);
+
+	// Session memory — restore first, save on close
+	const sessionMemory = new SessionMemory(context, accountManager, flowMode, floatingChat);
+	await sessionMemory.restore();
+
+	context.subscriptions.push(
+		// ── Inline diff commands ──
+		vscode.commands.registerCommand('macide.inlineDiff.accept',         () => inlineDiff.accept()),
+		vscode.commands.registerCommand('macide.inlineDiff.acceptLine',     () => inlineDiff.acceptLine()),
+		vscode.commands.registerCommand('macide.inlineDiff.reject',         () => inlineDiff.reject()),
+		vscode.commands.registerCommand('macide.inlineDiff.openDiffEditor', () => inlineDiff.openDiffEditor()),
+		vscode.commands.registerCommand('macide.showInlineDiffActions',     () => inlineDiff.showActions()),
+		vscode.commands.registerCommand('macide.reviewInlineChange',        () => inlineDiff.reviewSelection()),
+
+		// ── Context pin commands ──
+		vscode.commands.registerCommand('macide.pinToAiContext',        () => contextPins.pinCurrent()),
+		vscode.commands.registerCommand('macide.unpinFromAiContext',    (id: string) => contextPins.remove(id)),
+		vscode.commands.registerCommand('macide.toggleContextPin',      (id: string) => contextPins.toggle(id)),
+		vscode.commands.registerCommand('macide.clearContextPins',      () => contextPins.clearAll()),
+		vscode.commands.registerCommand('macide.copyContextPins',       () => contextPins.copyToClipboard()),
+
+		// ── Floating chat commands ──
+		vscode.commands.registerCommand('macide.openFloatingChat',      () => floatingChat.open()),
+
+		// ── Contextual surface command ──
+		vscode.commands.registerCommand('macide.showContextSuggestions', () => contextualSurface.show()),
+	);
+
 	// --- Cleanup ---
 	context.subscriptions.push(
 		accountPanel,
@@ -303,6 +356,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		branchPill,
 		flowMode,
 		toastService,
+		inlineDiff,
+		contextPins,
+		floatingChat,
+		contextualSurface,
+		sessionMemory,
 		{
 			dispose: () => {
 				clearInterval(resetInterval);
