@@ -1,0 +1,25 @@
+diff --git a/src/vs/workbench/contrib/chat/browser/chatSetup/chatSetupController.ts b/src/vs/workbench/contrib/chat/browser/chatSetup/chatSetupController.ts
+index 0379543f996..c19b3168b74 100644
+--- a/src/vs/workbench/contrib/chat/browser/chatSetup/chatSetupController.ts
++++ b/src/vs/workbench/contrib/chat/browser/chatSetup/chatSetupController.ts
+@@ -161,18 +161,8 @@ export class ChatSetupController extends Disposable {
+ 			this.logService.error(`[chat setup] signIn: error ${e}`);
+ 		}
+ 
+-		if (!defaultAccount && !this.lifecycleService.willShutdown) {
+-			const { confirmed } = await this.dialogService.confirm({
+-				type: Severity.Error,
+-				message: localize('unknownSignInError', "Failed to sign in to {0}. Would you like to try again?", this.defaultAccountService.getDefaultAccountAuthenticationProvider().name),
+-				detail: localize('unknownSignInErrorDetail', "You must be signed in to use AI features."),
+-				primaryButton: localize('retry', "Retry")
+-			});
+-
+-			if (confirmed) {
+-				return this.signIn(options);
+-			}
+-		}
++		// Macide: suppress the built-in sign-in error dialog; Macide uses its own
++		// authentication flow (macide-core extension) instead of VS Code's Chat Setup.
+ 
+ 		return { defaultAccount, entitlement: entitlements?.entitlement };
+ 	}
