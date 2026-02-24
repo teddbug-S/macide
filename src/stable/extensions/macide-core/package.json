@@ -10,7 +10,7 @@
     "vscode": "*"
   },
   "categories": ["Other"],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": ["onStartupFinished", "onAuthenticationRequest:github"],
   "main": "./out/extension.js",
   "contributes": {
     "themes": [

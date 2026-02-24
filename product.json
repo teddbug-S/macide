@@ -1,5 +1,8 @@
 {
   "defaultColorTheme": "Obsidian Flow",
+  "configurationDefaults": {
+    "github-authentication.preferDeviceCodeFlow": true
+  },
   "extensionAllowedBadgeProviders": [
     "api.bintray.com",
     "api.travis-ci.com",
