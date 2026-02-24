@@ -53,6 +53,56 @@
         "command": "macide.removeAccount",
         "title": "Macide: Remove GitHub Account",
         "category": "Macide"
+      },
+      {
+        "command": "macide.simulateRateLimit",
+        "title": "Macide (Debug): Simulate Rate Limit",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.resetUsageCounts",
+        "title": "Macide (Debug): Reset Usage Counts",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.toggleBlame",
+        "title": "Macide: Toggle Blame Annotations",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.clearBlame",
+        "title": "Macide: Clear Blame Annotations",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.conflict.keepOurs",
+        "title": "Keep Ours (Current Branch)",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.conflict.keepTheirs",
+        "title": "Keep Theirs (Incoming)",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.conflict.keepBoth",
+        "title": "Keep Both Changes",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.conflict.open3Way",
+        "title": "Open 3-Way Diff",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.openStashManager",
+        "title": "Macide: Open Stash Manager",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.checkCrossAccountRemote",
+        "title": "Macide: Check Cross-Account Remote",
+        "category": "Macide"
       }
     ],
     "keybindings": [
@@ -81,6 +131,16 @@
         "command": "macide.generateCommitMessage",
         "key": "ctrl+shift+m",
         "mac": "cmd+shift+m"
+      },
+      {
+        "command": "macide.toggleBlame",
+        "key": "ctrl+shift+g b",
+        "mac": "cmd+shift+g b"
+      },
+      {
+        "command": "macide.openStashManager",
+        "key": "ctrl+shift+g s",
+        "mac": "cmd+shift+g s"
       }
     ],
     "configuration": {
