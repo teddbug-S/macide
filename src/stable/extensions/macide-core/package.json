@@ -215,6 +215,26 @@
         "command": "macide.openSettings",
         "title": "Macide: Open Settings",
         "category": "Macide"
+      },
+      {
+        "command": "macide.checkForUpdates",
+        "title": "Macide: Check for Updates",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.applyUpdate",
+        "title": "$(arrow-up) Install Macide Update",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.dismissUpdate",
+        "title": "Macide: Dismiss Update Notification",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.showPerfReport",
+        "title": "Macide (Debug): Show Performance Report",
+        "category": "Macide"
       }
     ],
     "menus": {
@@ -412,6 +432,21 @@
           "type": "string",
           "default": "",
           "description": "GitHub OAuth App Client ID used for the Device Flow authorization. Register an app at https://github.com/settings/developers (no callback URL needed for Device Flow). Can also be set via the MACIDE_GITHUB_CLIENT_ID environment variable."
+        },
+        "macide.updates.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically check for Macide updates on launch and every 24 hours."
+        },
+        "macide.updates.githubOwner": {
+          "type": "string",
+          "default": "macide-app",
+          "description": "GitHub organisation or user that owns the Macide release repository."
+        },
+        "macide.updates.githubRepo": {
+          "type": "string",
+          "default": "macide",
+          "description": "GitHub repository name where Macide releases are published."
         }
       }
     }

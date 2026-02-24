@@ -27,6 +27,9 @@ import { FlowModeController } from './ui/flowMode/flowModeController';
 // --- M8 Settings & Config ---
 import { MacideConfig } from './config/macideConfig';
 import { SettingsPanel } from './ui/settings/settingsPanel';
+// --- M9 Performance & Distribution ---
+import { AutoUpdater } from './update/autoUpdater';
+import { PerfMonitor, LazyPanel } from './performance/perfMonitor';
 // --- M7 Antigravity Features ---
 import { InlineDiffController } from './ui/inlineDiff/inlineDiffController';
 import { ContextPinsProvider } from './ui/contextPins/contextPinsProvider';
@@ -35,6 +38,13 @@ import { SessionMemory } from './session/sessionMemory';
 import { ContextualSurface } from './ui/commandPalette/contextualSurface';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+	// M9: capture activate start time as early as possible
+	const perfStart = performance.now();
+	const perf = new PerfMonitor(context);
+	perf.setActivateStart(perfStart);
+	// Declared early so command closures can reference it before construction
+	let updater!: AutoUpdater;
+
 	// --- Core services ---
 	const notifications = new NotificationService();
 	const accountManager = new AccountManager(context);
@@ -80,7 +90,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	context.subscriptions.push(
 		accountManager.onDidChangeActive(account => {
 			if (account) {
+				perf.mark('accountSwitch');
 				authProvider.notifySessionChanged(account);
+				perf.measure('accountSwitch', 'accountSwitch');
 			}
 		})
 	);
@@ -357,7 +369,22 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
 		// ── Contextual surface command ──
 		vscode.commands.registerCommand('macide.showContextSuggestions', () => contextualSurface.show()),
+
+		// ── M9 Update commands ──
+		vscode.commands.registerCommand('macide.checkForUpdates',  () => updater.checkNow()),
+		vscode.commands.registerCommand('macide.applyUpdate',      () => updater.applyUpdate()),
+		vscode.commands.registerCommand('macide.dismissUpdate',    () => updater.dismiss()),
+
+		// ── M9 Performance report command ──
+		vscode.commands.registerCommand('macide.showPerfReport',   () => perf.showReport()),
 	);
+
+	// M9: start auto-updater (after all UI is ready)
+	updater = new AutoUpdater(context);
+	updater.start();
+
+	// M9: record activation end
+	perf.recordActivationEnd();
 
 	// --- Cleanup ---
 	context.subscriptions.push(
@@ -376,6 +403,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		floatingChat,
 		contextualSurface,
 		sessionMemory,
+		updater,
+		perf,
 		{
 			dispose: () => {
 				clearInterval(resetInterval);

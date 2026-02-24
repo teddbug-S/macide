@@ -1,0 +1,358 @@
+# Macide CI — builds on all platforms when a version tag (v*) is pushed
+# or on manual workflow_dispatch. Produces platform artifacts and creates
+# a GitHub Release with all signed/notarized installers.
+
+name: macide-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_build:
+        type: boolean
+        description: Force build even without a version tag
+      release_channel:
+        type: choice
+        description: Release channel
+        default: stable
+        options: [stable, insider]
+
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'      # e.g. v1.0.0
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'    # e.g. v1.0.0-beta.1
+
+env:
+  APP_NAME: Macide
+  APP_NAME_LC: macide
+  BINARY_NAME: macide
+  ORG_NAME: ${{ github.repository_owner }}
+  VSCODE_QUALITY: stable
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Determine release metadata
+# ─────────────────────────────────────────────────────────────────────────────
+jobs:
+  version:
+    name: Extract version
+    runs-on: ubuntu-latest
+    outputs:
+      RELEASE_VERSION: ${{ steps.ver.outputs.RELEASE_VERSION }}
+      IS_RELEASE:      ${{ steps.ver.outputs.IS_RELEASE }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        id: ver
+        run: |
+          if [[ "${{ github.ref }}" =~ ^refs/tags/v(.+)$ ]]; then
+            echo "RELEASE_VERSION=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+            echo "IS_RELEASE=yes"                      >> "$GITHUB_OUTPUT"
+          else
+            # Use package.json version for non-tag builds
+            VERSION=$(jq -r '.version' src/stable/extensions/macide-core/package.json)
+            echo "RELEASE_VERSION=${VERSION}-dev.$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+            echo "IS_RELEASE=${{ inputs.force_build == 'true' && 'yes' || 'no' }}" >> "$GITHUB_OUTPUT"
+          fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Linux builds
+# ─────────────────────────────────────────────────────────────────────────────
+  build-linux:
+    name: Build Linux ${{ matrix.arch }}
+    runs-on: ubuntu-22.04
+    needs: version
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64, armhf]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            build-essential libx11-dev libxkbfile-dev libsecret-1-dev \
+            libkrb5-dev fakeroot rpm imagemagick jq
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure build environment
+        run: |
+          echo "OS_NAME=linux"                              >> "$GITHUB_ENV"
+          echo "VSCODE_ARCH=${{ matrix.arch }}"            >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=${{ needs.version.outputs.RELEASE_VERSION }}" >> "$GITHUB_ENV"
+          echo "SHOULD_BUILD=yes"                          >> "$GITHUB_ENV"
+          echo "CI_BUILD=yes"                              >> "$GITHUB_ENV"
+
+      - name: Prepare VSCode sources
+        run: . prepare_vscode.sh
+        env:
+          SHOULD_BUILD: 'yes'
+
+      - name: Compile Macide assets
+        run: bash build/macide/macide_assets.sh
+        env:
+          RELEASE_VERSION: ${{ needs.version.outputs.RELEASE_VERSION }}
+
+      - name: Build
+        run: . build.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package .deb and .AppImage
+        run: . prepare_assets.sh
+        env:
+          SHOULD_BUILD_DEB:      'yes'
+          SHOULD_BUILD_APPIMAGE: 'yes'
+          SHOULD_BUILD_RPM:      'no'
+
+      - name: Package .rpm (x64 only)
+        if: matrix.arch == 'x64'
+        run: . prepare_assets.sh
+        env:
+          SHOULD_BUILD_DEB:      'no'
+          SHOULD_BUILD_APPIMAGE: 'no'
+          SHOULD_BUILD_RPM:      'yes'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macide-linux-${{ matrix.arch }}
+          path: assets/
+          retention-days: 5
+
+# ─────────────────────────────────────────────────────────────────────────────
+# macOS builds
+# ─────────────────────────────────────────────────────────────────────────────
+  build-macos:
+    name: Build macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-14' || 'macos-13' }}
+    needs: version
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure build environment
+        run: |
+          echo "OS_NAME=osx"                               >> "$GITHUB_ENV"
+          echo "VSCODE_ARCH=${{ matrix.arch }}"            >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=${{ needs.version.outputs.RELEASE_VERSION }}" >> "$GITHUB_ENV"
+          echo "SHOULD_BUILD=yes"                          >> "$GITHUB_ENV"
+          echo "CI_BUILD=yes"                              >> "$GITHUB_ENV"
+
+      - name: Import signing certificate
+        if: env.CERTIFICATE_OSX_P12_DATA != ''
+        env:
+          CERTIFICATE_OSX_P12_DATA:     ${{ secrets.CERTIFICATE_OSX_P12_DATA }}
+          CERTIFICATE_OSX_P12_PASSWORD: ${{ secrets.CERTIFICATE_OSX_P12_PASSWORD }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain"
+          security create-keychain -p "" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "" "$KEYCHAIN"
+          echo "$CERTIFICATE_OSX_P12_DATA" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" \
+            -P "$CERTIFICATE_OSX_P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" "$KEYCHAIN"
+          security list-keychains -s "$KEYCHAIN" $(security list-keychains | xargs)
+
+      - name: Prepare VSCode sources
+        run: . prepare_vscode.sh
+        env:
+          SHOULD_BUILD: 'yes'
+
+      - name: Compile Macide assets
+        run: bash build/macide/macide_assets.sh
+
+      - name: Build
+        run: . build.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sign, notarize and package DMG
+        run: . prepare_assets.sh
+        env:
+          CERTIFICATE_OSX_P12_DATA:     ${{ secrets.CERTIFICATE_OSX_P12_DATA }}
+          CERTIFICATE_OSX_P12_PASSWORD: ${{ secrets.CERTIFICATE_OSX_P12_PASSWORD }}
+          CERTIFICATE_OSX_ID:           ${{ secrets.CERTIFICATE_OSX_ID }}
+          CERTIFICATE_OSX_TEAM_ID:      ${{ secrets.CERTIFICATE_OSX_TEAM_ID }}
+          CERTIFICATE_OSX_APP_PASSWORD: ${{ secrets.CERTIFICATE_OSX_APP_PASSWORD }}
+          SHOULD_BUILD_ZIP:             'yes'
+          SHOULD_BUILD_DMG:             '${{ env.CERTIFICATE_OSX_P12_DATA != "" && "yes" || "no" }}'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macide-macos-${{ matrix.arch }}
+          path: assets/
+          retention-days: 5
+
+  # macOS Universal (fat binary — merge x64 + arm64)
+  build-macos-universal:
+    name: Build macOS Universal
+    runs-on: macos-14
+    needs: [version, build-macos]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download x64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macide-macos-x64
+          path: assets-x64
+
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macide-macos-arm64
+          path: assets-arm64
+
+      - name: Create Universal DMG
+        run: bash build/macide/make_universal_dmg.sh
+        env:
+          RELEASE_VERSION: ${{ needs.version.outputs.RELEASE_VERSION }}
+          APP_NAME:        ${{ env.APP_NAME }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macide-macos-universal
+          path: assets/
+          retention-days: 5
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Windows builds
+# ─────────────────────────────────────────────────────────────────────────────
+  build-windows:
+    name: Build Windows ${{ matrix.arch }}
+    runs-on: windows-2022
+    needs: version
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure build environment
+        shell: bash
+        run: |
+          echo "OS_NAME=windows"                           >> "$GITHUB_ENV"
+          echo "VSCODE_ARCH=${{ matrix.arch }}"            >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=${{ needs.version.outputs.RELEASE_VERSION }}" >> "$GITHUB_ENV"
+          echo "SHOULD_BUILD=yes"                          >> "$GITHUB_ENV"
+          echo "CI_BUILD=yes"                              >> "$GITHUB_ENV"
+
+      - name: Prepare VSCode sources
+        shell: bash
+        run: . prepare_vscode.sh
+        env:
+          SHOULD_BUILD: 'yes'
+
+      - name: Compile Macide assets
+        shell: bash
+        run: bash build/macide/macide_assets.sh
+
+      - name: Build
+        shell: bash
+        run: . build.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package NSIS installer and ZIP
+        shell: bash
+        run: . prepare_assets.sh
+        env:
+          SHOULD_BUILD_EXE: 'yes'
+          SHOULD_BUILD_ZIP: 'yes'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macide-windows-${{ matrix.arch }}
+          path: assets/
+          retention-days: 5
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Create GitHub Release
+# ─────────────────────────────────────────────────────────────────────────────
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [version, build-linux, build-macos, build-macos-universal, build-windows]
+    if: needs.version.outputs.IS_RELEASE == 'yes'
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-assets
+          pattern: macide-*
+
+      - name: Flatten assets directory
+        run: |
+          mkdir -p release-assets
+          find all-assets -type f \( \
+            -name "*.deb" -o -name "*.AppImage" -o -name "*.rpm" \
+            -o -name "*.dmg" -o -name "*.zip" -o -name "*.exe" \
+          \) -exec mv {} release-assets/ \;
+
+      - name: Generate checksums
+        run: |
+          cd release-assets
+          sha256sum * > checksums.sha256
+          cat checksums.sha256
+
+      - name: Extract release notes
+        id: notes
+        run: |
+          if [[ -f release_notes.md ]]; then
+            {
+              echo 'NOTES<<EOF'
+              cat release_notes.md
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "NOTES=Macide ${{ needs.version.outputs.RELEASE_VERSION }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name:    v${{ needs.version.outputs.RELEASE_VERSION }}
+          name:        Macide ${{ needs.version.outputs.RELEASE_VERSION }}
+          body:        ${{ steps.notes.outputs.NOTES }}
+          draft:       false
+          prerelease:  ${{ contains(needs.version.outputs.RELEASE_VERSION, '-') }}
+          files:       release-assets/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

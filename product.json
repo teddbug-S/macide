@@ -608,5 +608,10 @@
     "gruntfuggly.todo-tree": {
       "default": false
     }
-  }
+  },
+  "electronArguments": [
+    "--disable-background-timer-throttling",
+    "--disable-renderer-backgrounding",
+    "--enable-gpu-rasterization"
+  ]
 }
