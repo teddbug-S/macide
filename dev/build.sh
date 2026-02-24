@@ -6,10 +6,10 @@
 ###
 
 export APP_NAME="Macide"
-export ASSETS_REPOSITORY="macide/macide"
+export ASSETS_REPOSITORY="teddbug-S/macide"
 export BINARY_NAME="macide"
 export CI_BUILD="no"
-export GH_REPO_PATH="macide/macide"
+export GH_REPO_PATH="teddbug-S/macide"
 export ORG_NAME="Macide"
 export SHOULD_BUILD="yes"
 export SKIP_ASSETS="yes"
@@ -22,7 +22,7 @@ export VSCODE_SKIP_NODE_VERSION_CHECK="yes"
 while getopts ":ilops" opt; do
   case "$opt" in
     i)
-      export ASSETS_REPOSITORY="macide/macide-insiders"
+      export ASSETS_REPOSITORY="teddbug-S/macide-insiders"
       export BINARY_NAME="macide-insiders"
       export VSCODE_QUALITY="insider"
       ;;
