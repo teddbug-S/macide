@@ -195,7 +195,7 @@ jobs:
           CERTIFICATE_OSX_TEAM_ID:      ${{ secrets.CERTIFICATE_OSX_TEAM_ID }}
           CERTIFICATE_OSX_APP_PASSWORD: ${{ secrets.CERTIFICATE_OSX_APP_PASSWORD }}
           SHOULD_BUILD_ZIP:             'yes'
-          SHOULD_BUILD_DMG:             '${{ env.CERTIFICATE_OSX_P12_DATA != "" && "yes" || "no" }}'
+          SHOULD_BUILD_DMG:             ${{ secrets.CERTIFICATE_OSX_P12_DATA != '' && 'yes' || 'no' }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
