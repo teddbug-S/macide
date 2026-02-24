@@ -210,6 +210,11 @@
         "command": "macide.showContextSuggestions",
         "title": "$(zap) Show Context Suggestions",
         "category": "Macide"
+      },
+      {
+        "command": "macide.openSettings",
+        "title": "Macide: Open Settings",
+        "category": "Macide"
       }
     ],
     "menus": {
@@ -311,6 +316,11 @@
         "command": "macide.showContextSuggestions",
         "key": "ctrl+shift+k",
         "mac": "cmd+shift+k"
+      },
+      {
+        "command": "macide.openSettings",
+        "key": "ctrl+,",
+        "mac": "cmd+,"
       }
     ],
     "configuration": {
@@ -349,6 +359,18 @@
           "default": true,
           "description": "Automatically resolve Git HTTPS credentials from stored Macide accounts."
         },
+        "macide.git.credentialMismatchBehavior": {
+          "type": "string",
+          "enum": ["warn", "auto-switch", "ignore"],
+          "default": "warn",
+          "description": "Action when the Git remote belongs to a different GitHub account than the active one."
+        },
+        "macide.git.commitFormat": {
+          "type": "string",
+          "enum": ["conventional", "freeform"],
+          "default": "conventional",
+          "description": "Default format for AI-generated commit messages."
+        },
         "macide.appearance.animationSpeed": {
           "type": "string",
           "enum": ["normal", "fast", "off"],
@@ -361,6 +383,30 @@
           "minimum": 0,
           "maximum": 100,
           "description": "Glassmorphism blur intensity for floating panels (0 = flat, 100 = full blur)."
+        },
+        "macide.appearance.accentColor": {
+          "type": "string",
+          "default": "#7c3aed",
+          "description": "Primary accent color (hex) used for highlights and active states."
+        },
+        "macide.appearance.editorFontFamily": {
+          "type": "string",
+          "default": "Geist Mono",
+          "description": "Monospace font family used in the code editor (mirrors editor.fontFamily)."
+        },
+        "macide.appearance.editorFontSize": {
+          "type": "number",
+          "default": 13,
+          "minimum": 8,
+          "maximum": 32,
+          "description": "Editor font size in pixels (mirrors editor.fontSize)."
+        },
+        "macide.appearance.vignetteIntensity": {
+          "type": "number",
+          "default": 30,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Intensity of the subtle edge vignette applied to the editor area."
         },
         "macide.githubClientId": {
           "type": "string",

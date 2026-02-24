@@ -24,6 +24,9 @@ import { StashManagerPanel } from './git/stashManager';
 import { ToastService } from './ui/toast/toastService';
 import { BranchPill } from './ui/branchPill/branchPill';
 import { FlowModeController } from './ui/flowMode/flowModeController';
+// --- M8 Settings & Config ---
+import { MacideConfig } from './config/macideConfig';
+import { SettingsPanel } from './ui/settings/settingsPanel';
 // --- M7 Antigravity Features ---
 import { InlineDiffController } from './ui/inlineDiff/inlineDiffController';
 import { ContextPinsProvider } from './ui/contextPins/contextPinsProvider';
@@ -36,6 +39,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	const notifications = new NotificationService();
 	const accountManager = new AccountManager(context);
 	await accountManager.load();
+
+	// M8: Config — load ~/.macide/macide-config.json (non-sensitive settings)
+	const macideConfig = new MacideConfig();
 
 	// M6 Toast Service — wire before anything that calls notifications
 	const toastService = new ToastService(context);
@@ -82,9 +88,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	// --- Keep rotator + tracker in sync with settings changes ---
 	context.subscriptions.push(
 		vscode.workspace.onDidChangeConfiguration(e => {
-			if (e.affectsConfiguration('macide.accounts.rotationStrategy') ||
-			    e.affectsConfiguration('macide.accounts.assumedDailyLimit')) {
+			if (e.affectsConfiguration('macide')) {
 				syncSettings();
+				macideConfig.syncFromVsCode();
 			}
 		})
 	);
@@ -298,6 +304,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		vscode.commands.registerCommand('macide.openBranchSwitcher', () => BranchPill.openBranchSwitcher()),
 	);
 
+	// ── M8: Settings & Config ────────────────────────────────────────────────
+
+	const settingsPanel = new SettingsPanel(context, accountManager, macideConfig);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('macide.openSettings', () => settingsPanel.open())
+	);
+
 	// ── M7: Antigravity Features ──────────────────────────────────────────────
 
 	// Inline diff review controller
@@ -356,6 +370,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		branchPill,
 		flowMode,
 		toastService,
+		settingsPanel,
 		inlineDiff,
 		contextPins,
 		floatingChat,
