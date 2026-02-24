@@ -1,8 +1,8 @@
-<div id="vscodium-logo" align="center">
+<div id="macide-logo" align="center">
     <br />
-    <img src="./icons/stable/codium_cnl.svg" alt="VSCodium Logo" width="200"/>
-    <h1>VSCodium</h1>
-    <h3>Free/Libre Open Source Software Binaries of Visual Studio Code</h3>
+    <img src="./icons/stable/codium_cnl.svg" alt="Macide Logo" width="200"/>
+    <h1>Macide</h1>
+    <h3>Multi-Account Copilot IDE</h3>
 </div>
 
 <div id="badges" align="center">
