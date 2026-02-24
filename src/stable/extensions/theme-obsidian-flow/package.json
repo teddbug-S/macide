@@ -1,0 +1,21 @@
+{
+  "name": "theme-obsidian-flow",
+  "displayName": "Obsidian Flow",
+  "description": "The default Macide dark theme — deep, fluid, alive.",
+  "version": "1.0.0",
+  "publisher": "Macide",
+  "license": "MIT",
+  "engines": {
+    "vscode": "*"
+  },
+  "categories": ["Themes"],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Obsidian Flow",
+        "uiTheme": "vs-dark",
+        "path": "./themes/obsidian-flow-color-theme.json"
+      }
+    ]
+  }
+}

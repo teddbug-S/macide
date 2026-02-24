@@ -4,15 +4,15 @@
 	<metadata_license>@@LICENSE@@</metadata_license>
 	<project_license>@@LICENSE@@</project_license>
 	<name>@@NAME_LONG@@</name>
-	<url type="homepage">https://www.vscodium.com</url>
-	<summary>VSCodium. Code editing. Redefined.</summary>
+	<url type="homepage">https://github.com/macide/macide</url>
+	<summary>Macide — Multi-Account Copilot IDE</summary>
 	<description>
-		<p>VSCodium is a community-driven, freely-licensed binary distribution of Microsoft's editor VS Code.</p>
+		<p>Macide is a modern, lightweight code editor built as a fork of VSCodium. It enables developers to manage, switch between, and auto-rotate across multiple GitHub Copilot accounts from a single unified interface, with a beautiful Obsidian Flow design system and enhanced Git tooling.</p>
 	</description>
 	<screenshots>
 		<screenshot type="default">
-			<image>https://www.vscodium.com/img/vscodium.png</image>
-			<caption>Editing C</caption>
+			<image>https://raw.githubusercontent.com/macide/macide/main/icons/stable/macide.png</image>
+			<caption>Macide — Multi-Account Copilot IDE</caption>
 		</screenshot>
 	</screenshots>
 </component>

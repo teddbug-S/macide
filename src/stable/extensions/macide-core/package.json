@@ -1,0 +1,147 @@
+{
+  "name": "macide-core",
+  "displayName": "Macide Core",
+  "description": "Multi-account GitHub Copilot management, account rotation, and enhanced Git tooling for Macide.",
+  "version": "1.0.0",
+  "publisher": "Macide",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "vscode": "*"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "macide.addAccount",
+        "title": "Macide: Add GitHub Account",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.openAccountPanel",
+        "title": "Macide: Open Account Panel",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.switchAccount",
+        "title": "Macide: Switch Account",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.showAccountStatus",
+        "title": "Macide: Show Account Status",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.enterFlowMode",
+        "title": "Macide: Enter Flow Mode",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.openGitHistory",
+        "title": "Macide: Open Git History",
+        "category": "Macide"
+      },
+      {
+        "command": "macide.generateCommitMessage",
+        "title": "Macide: Generate AI Commit Message",
+        "category": "Macide"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "macide.openAccountPanel",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      },
+      {
+        "command": "macide.switchAccount",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "false"
+      },
+      {
+        "command": "macide.enterFlowMode",
+        "key": "ctrl+.",
+        "mac": "cmd+."
+      },
+      {
+        "command": "macide.openGitHistory",
+        "key": "ctrl+shift+g h",
+        "mac": "cmd+shift+g h"
+      },
+      {
+        "command": "macide.generateCommitMessage",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m"
+      }
+    ],
+    "configuration": {
+      "title": "Macide",
+      "properties": {
+        "macide.accounts.rotationStrategy": {
+          "type": "string",
+          "enum": ["round-robin", "least-used", "manual"],
+          "default": "round-robin",
+          "description": "Strategy used to auto-rotate GitHub Copilot accounts when rate limits are hit."
+        },
+        "macide.accounts.autoRotation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically switch to the next account when the current one hits a rate limit."
+        },
+        "macide.accounts.assumedDailyLimit": {
+          "type": "number",
+          "default": 300,
+          "minimum": 1,
+          "description": "Assumed daily Copilot request limit per account (GitHub does not publish exact limits)."
+        },
+        "macide.git.inlineBlame": {
+          "type": "string",
+          "enum": ["current-line", "all-lines", "off"],
+          "default": "current-line",
+          "description": "Show inline Git blame annotations."
+        },
+        "macide.git.aiCommitMessages": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-assisted commit message generation using the active Copilot account."
+        },
+        "macide.git.credentialBridge": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically resolve Git HTTPS credentials from stored Macide accounts."
+        },
+        "macide.appearance.animationSpeed": {
+          "type": "string",
+          "enum": ["normal", "fast", "off"],
+          "default": "normal",
+          "description": "Speed of UI animations. 'Off' disables all transitions."
+        },
+        "macide.appearance.glassmorphismIntensity": {
+          "type": "number",
+          "default": 100,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Glassmorphism blur intensity for floating panels (0 = flat, 100 = full blur)."
+        },
+        "macide.githubClientId": {
+          "type": "string",
+          "default": "",
+          "description": "GitHub OAuth App Client ID used for the Device Flow authorization. Register an app at https://github.com/settings/developers (no callback URL needed for Device Flow). Can also be set via the MACIDE_GITHUB_CLIENT_ID environment variable."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p tsconfig.json",
+    "watch": "tsc -watch -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/vscode": "*",
+    "@types/node": "*",
+    "typescript": "^5.0.0"
+  }
+}
