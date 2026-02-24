@@ -2,24 +2,29 @@
 
 set -ex
 
+# ensure rustup/cargo are in PATH when run outside a CI environment
+if [[ -f "${HOME}/.cargo/env" ]]; then
+  . "${HOME}/.cargo/env"
+fi
+
 cd cli
 
 export CARGO_NET_GIT_FETCH_WITH_CLI="true"
 export VSCODE_CLI_APP_NAME="$( echo "${APP_NAME}" | awk '{print tolower($0)}' )"
 export VSCODE_CLI_BINARY_NAME="$( node -p "require(\"../product.json\").serverApplicationName" )"
-export VSCODE_CLI_UPDATE_ENDPOINT="https://raw.githubusercontent.com/macide/versions/refs/heads/master"
+export VSCODE_CLI_UPDATE_ENDPOINT="https://raw.githubusercontent.com/teddbug-S/macide-versions/refs/heads/master"
 
 if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-  export VSCODE_CLI_DOWNLOAD_ENDPOINT="https://github.com/macide/macide-insiders/releases"
+  export VSCODE_CLI_DOWNLOAD_ENDPOINT="https://github.com/teddbug-S/macide-insiders/releases"
 else
-  export VSCODE_CLI_DOWNLOAD_ENDPOINT="https://github.com/macide/macide/releases"
+  export VSCODE_CLI_DOWNLOAD_ENDPOINT="https://github.com/teddbug-S/macide/releases"
 fi
 
 TUNNEL_APPLICATION_NAME="$( node -p "require(\"../product.json\").tunnelApplicationName" )"
 NAME_SHORT="$( node -p "require(\"../product.json\").nameShort" )"
 
 npm pack @vscode/openssl-prebuilt@0.0.11
-mkdir openssl
+mkdir -p openssl
 tar -xvzf vscode-openssl-prebuilt-0.0.11.tgz --strip-components=1 --directory=openssl
 
 if [[ "${OS_NAME}" == "osx" ]]; then
