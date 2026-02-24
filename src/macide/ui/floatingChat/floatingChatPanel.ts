@@ -104,7 +104,7 @@ export class FloatingChatPanel implements vscode.Disposable {
 			case 'insertAtCursor': {
 				const editor = vscode.window.activeTextEditor;
 				if (editor) {
-					await editor.edit(b => b.replace(editor.selection, msg.text));
+					await editor.edit((b: vscode.TextEditorEdit) => b.replace(editor.selection, msg.text));
 				}
 				break;
 			}
@@ -417,8 +417,8 @@ document.getElementById('btn-clear').addEventListener('click', function(){
 function renderMarkdown(text){
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/```([\w]*)\n([\s\S]*?)```/g, function(_,lang,code){ return '<pre>' + code.trimEnd() + '</pre>'; })
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\x60\x60\x60([\\w]*)\\n([\\s\\S]*?)\x60\x60\x60/g, function(_,lang,code){ return '<pre>' + code.trimEnd() + '</pre>'; })
+    .replace(/\x60([^\x60]+)\x60/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
     .replace(/\n/g, '<br>');

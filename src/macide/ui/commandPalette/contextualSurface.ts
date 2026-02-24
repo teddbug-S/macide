@@ -140,7 +140,7 @@ export class ContextualSurface implements vscode.Disposable {
 
 			// ── 4. Uncommitted changes ──────────────────────────────────────────
 			const diagnostics = vscode.languages.getDiagnostics(doc.uri);
-			const hasErrors   = diagnostics.some(d => d.severity === vscode.DiagnosticSeverity.Error);
+			const hasErrors   = diagnostics.some((d: vscode.Diagnostic) => d.severity === vscode.DiagnosticSeverity.Error);
 
 			if (!hasErrors) {
 				// Lightweight check: does this file have a dirty indicator?

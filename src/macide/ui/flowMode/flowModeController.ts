@@ -84,7 +84,7 @@ export class FlowModeController implements vscode.Disposable {
 		vscode.window.showInformationMessage(
 			'Macide: ⚡ Flow Mode activated — sidebar and panel hidden.',
 			'Exit Flow Mode'
-		).then(action => {
+		).then((action: string | undefined) => {
 			if (action === 'Exit Flow Mode') this.exit();
 		});
 	}

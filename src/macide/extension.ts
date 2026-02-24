@@ -40,7 +40,7 @@ import { ContextualSurface } from './ui/commandPalette/contextualSurface';
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	// M9: capture activate start time as early as possible
 	const perfStart = performance.now();
-	const perf = new PerfMonitor(context);
+	const perf = new PerfMonitor();
 	perf.setActivateStart(perfStart);
 	// Declared early so command closures can reference it before construction
 	let updater!: AutoUpdater;
@@ -373,7 +373,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		// ── M9 Update commands ──
 		vscode.commands.registerCommand('macide.checkForUpdates',  () => updater.checkNow()),
 		vscode.commands.registerCommand('macide.applyUpdate',      () => updater.applyUpdate()),
-		vscode.commands.registerCommand('macide.dismissUpdate',    () => updater.dismiss()),
+		vscode.commands.registerCommand('macide.dismissUpdate',    () => updater.dismissUpdate()),
 
 		// ── M9 Performance report command ──
 		vscode.commands.registerCommand('macide.showPerfReport',   () => perf.showReport()),

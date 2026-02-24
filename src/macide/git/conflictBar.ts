@@ -63,13 +63,13 @@ export class ConflictBarProvider implements vscode.CodeLensProvider, vscode.Disp
 	constructor() {
 		// Refresh whenever any document changes
 		this._disposables.push(
-			vscode.workspace.onDidChangeTextDocument(e => {
+			vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
 				if (this._hasConflictFile(e.document)) {
 					this._onDidChangeCodeLenses.fire();
 					this._updateDecorations(e.document);
 				}
 			}),
-			vscode.window.onDidChangeActiveTextEditor(editor => {
+			vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor | undefined) => {
 				if (editor) this._updateDecorations(editor.document);
 			})
 		);
@@ -124,7 +124,7 @@ export class ConflictBarProvider implements vscode.CodeLensProvider, vscode.Disp
 
 	private _updateDecorations(document: vscode.TextDocument): void {
 		const editors = vscode.window.visibleTextEditors.filter(
-			e => e.document === document
+			(e: vscode.TextEditor) => e.document === document
 		);
 		if (!editors.length) return;
 

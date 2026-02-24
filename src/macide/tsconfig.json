@@ -1,0 +1,12 @@
+{
+	"extends": "../stable/extensions/macide-core/tsconfig.json",
+	"compilerOptions": {
+		"rootDir": ".",
+		"noEmit": true,
+		"typeRoots": [
+			"../stable/extensions/macide-core/node_modules/@types"
+		]
+	},
+	"include": ["./**/*.ts"],
+	"exclude": ["node_modules"]
+}

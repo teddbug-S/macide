@@ -17,3 +17,8 @@ build/windows/msi/Files*.wixobj
 sourcemaps/
 stores/snapcraft/insider/*.snap
 stores/snapcraft/stable/*.snap
+
+# Macide extension build artifacts
+node_modules/
+src/stable/extensions/macide-core/out/
+src/stable/extensions/macide-core/node_modules/

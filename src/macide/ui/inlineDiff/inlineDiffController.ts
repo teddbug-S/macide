@@ -46,7 +46,6 @@ const REMOVED_DECO = vscode.window.createTextEditorDecorationType({
 		contentText: ' [removed]',
 		color:       '#ef444488',
 		fontStyle:   'italic',
-		fontSize:    '11px',
 	}
 });
 
@@ -88,9 +87,9 @@ export class InlineDiffController implements vscode.Disposable {
 
 		this._disposables.push(
 			// Detect large multi-line insertions
-			vscode.workspace.onDidChangeTextDocument(e => this._onDocChange(e)),
+			vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => this._onDocChange(e)),
 			// Clear when active editor switches away
-			vscode.window.onDidChangeActiveTextEditor(e => {
+			vscode.window.onDidChangeActiveTextEditor((e: vscode.TextEditor | undefined) => {
 				if (e && this._session && e.document.uri.toString() !== this._session.uri) {
 					this._clearSession();
 				}
@@ -110,7 +109,7 @@ export class InlineDiffController implements vscode.Disposable {
 
 			// Find the editor
 			const editor = vscode.window.visibleTextEditors.find(
-				ed => ed.document === e.document
+				(ed: vscode.TextEditor) => ed.document === e.document
 			);
 			if (!editor) continue;
 
@@ -262,7 +261,7 @@ export class InlineDiffController implements vscode.Disposable {
 	private _clearSession(): void {
 		// Clear decorations from all visible editors for this URI
 		if (this._session) {
-			vscode.window.visibleTextEditors.forEach(e => {
+			vscode.window.visibleTextEditors.forEach((e: vscode.TextEditor) => {
 				e.setDecorations(ADDED_DECO,   []);
 				e.setDecorations(REMOVED_DECO, []);
 			});

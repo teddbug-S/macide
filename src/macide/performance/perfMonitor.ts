@@ -56,7 +56,7 @@ interface Measurement {
 // ---------------------------------------------------------------------------
 
 export class PerfMonitor implements vscode.Disposable {
-	private readonly _channel:       vscode.OutputChannel;
+	private readonly _channel:       vscode.LogOutputChannel;
 	private readonly _measurements:  Measurement[] = [];
 	private readonly _marks:         Map<string, number> = new Map();
 	private readonly _disposables:   vscode.Disposable[] = [];

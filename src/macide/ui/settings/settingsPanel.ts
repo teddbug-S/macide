@@ -116,9 +116,9 @@ export class SettingsPanel implements vscode.Disposable {
 
 		// Get list of installed VS Code themes
 		const themeExt = vscode.extensions.all
-			.flatMap(e => (e.packageJSON?.contributes?.themes ?? []) as any[])
+			.flatMap((e: vscode.Extension<any>) => (e.packageJSON?.contributes?.themes ?? []) as any[])
 			.map((t: any) => ({ label: t.label ?? t.id, id: t.label ?? t.id }))
-			.filter((t, i, arr) => arr.findIndex(x => x.id === t.id) === i)
+			.filter((t: any, i: number, arr: any[]) => arr.findIndex((x: any) => x.id === t.id) === i)
 			.slice(0, 60);
 
 		const currentTheme = vscode.workspace.getConfiguration('workbench').get<string>('colorTheme', 'Obsidian Flow');

@@ -57,7 +57,7 @@ function runBlame(filePath: string, startLine: number, endLine: number): Promise
 		const cwd = path.dirname(filePath);
 		const args = ['blame', '--porcelain', `-L${startLine},${endLine}`, '--', filePath];
 
-		cp.execFile('git', args, { cwd, timeout: 5000 }, (err, stdout) => {
+		cp.execFile('git', args, { cwd, timeout: 5000 }, (err: Error | null, stdout: string) => {
 			const result = new Map<number, BlameEntry>();
 			if (err || !stdout.trim()) {
 				resolve(result);
@@ -125,7 +125,7 @@ export class BlameAnnotationController implements vscode.Disposable {
 
 		// Cursor change → debounced refresh (current-line mode)
 		this._disposables.push(
-			vscode.window.onDidChangeTextEditorSelection(e => {
+			vscode.window.onDidChangeTextEditorSelection((e: vscode.TextEditorSelectionChangeEvent) => {
 				if (this._mode !== 'current-line') return;
 				clearTimeout(this._debounceTimer);
 				this._debounceTimer = setTimeout(
@@ -137,7 +137,7 @@ export class BlameAnnotationController implements vscode.Disposable {
 
 		// Active editor change → refresh
 		this._disposables.push(
-			vscode.window.onDidChangeActiveTextEditor(editor => {
+			vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor | undefined) => {
 				if (!editor) return;
 				if (this._mode === 'all-lines') {
 					this._refreshAllLines(editor);
@@ -149,7 +149,7 @@ export class BlameAnnotationController implements vscode.Disposable {
 
 		// Document save → invalidate cache
 		this._disposables.push(
-			vscode.workspace.onDidSaveTextDocument(doc => {
+			vscode.workspace.onDidSaveTextDocument((doc: vscode.TextDocument) => {
 				_blameCache.delete(doc.uri.fsPath);
 				// Re-annotate if relevant editor is active
 				const editor = vscode.window.activeTextEditor;
@@ -162,7 +162,7 @@ export class BlameAnnotationController implements vscode.Disposable {
 
 		// Settings change
 		this._disposables.push(
-			vscode.workspace.onDidChangeConfiguration(e => {
+			vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {
 				if (e.affectsConfiguration('macide.git.inlineBlame')) {
 					this._mode = vscode.workspace.getConfiguration('macide').get<BlameMode>('git.inlineBlame', 'current-line');
 					this._applyMode();
@@ -184,7 +184,7 @@ export class BlameAnnotationController implements vscode.Disposable {
 	}
 
 	clear(): void {
-		vscode.window.visibleTextEditors.forEach(e => e.setDecorations(BLAME_DECO, []));
+		vscode.window.visibleTextEditors.forEach((e: vscode.TextEditor) => e.setDecorations(BLAME_DECO, []));
 	}
 
 	// -------------------------------------------------------------------------

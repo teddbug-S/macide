@@ -20,7 +20,7 @@ import { getActiveRepo } from './gitApi';
 
 function execGit(args: string[], cwd: string): Promise<string> {
 	return new Promise((resolve, reject) => {
-		cp.execFile('git', args, { cwd, timeout: 10_000 }, (err, stdout, stderr) => {
+		cp.execFile('git', args, { cwd, timeout: 10_000 }, (err: Error | null, stdout: string, stderr: string) => {
 			if (err) reject(new Error(stderr || err.message));
 			else resolve(stdout);
 		});

@@ -89,9 +89,9 @@ function githubPost(path: string, body: Record<string, string>): Promise<Record<
 			}
 		};
 
-		const req = https.request(options, res => {
+		const req = https.request(options, (res: import('http').IncomingMessage) => {
 			let data = '';
-			res.on('data', chunk => (data += chunk));
+			res.on('data', (chunk: string) => (data += chunk));
 			res.on('end', () => {
 				try {
 					resolve(JSON.parse(data));
@@ -122,9 +122,9 @@ function githubGet<T>(apiPath: string, token: string): Promise<T> {
 			}
 		};
 
-		const req = https.request(options, res => {
+		const req = https.request(options, (res: import('http').IncomingMessage) => {
 			let data = '';
-			res.on('data', chunk => (data += chunk));
+			res.on('data', (chunk: string) => (data += chunk));
 			res.on('end', () => {
 				if (res.statusCode && res.statusCode >= 400) {
 					reject(new Error(`GitHub API ${res.statusCode}: ${data}`));
@@ -222,7 +222,7 @@ export class OAuthFlow {
 			`Macide: Authorize GitHub — enter code  ${user_code}  at ${verification_uri}`,
 			copyAndOpen,
 			justOpen
-		).then(selection => {
+		).then((selection: string | undefined) => {
 			if (selection === copyAndOpen) {
 				vscode.env.clipboard.writeText(user_code);
 			}
@@ -238,7 +238,7 @@ export class OAuthFlow {
 				title: `Macide: Waiting for GitHub authorization…  (code: ${user_code})`,
 				cancellable: true
 			},
-			async (_progress, token) => {
+			async (_progress: vscode.Progress<{ message?: string; increment?: number }>, token: vscode.CancellationToken) => {
 				token.onCancellationRequested(() => {
 					this._cancelled = true;
 				});

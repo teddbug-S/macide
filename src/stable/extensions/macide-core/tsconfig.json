@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "ES2022",
+		"lib": ["ES2022"],
+		"outDir": "./out",
+		"rootDir": "../../../macide",
+		"sourceMap": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"declaration": true,
+		"declarationMap": true,
+		"moduleResolution": "node"
+	},
+	"include": [
+		"../../../macide/**/*.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"out"
+	]
+}

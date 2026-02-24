@@ -169,7 +169,7 @@ export class BranchPill implements vscode.Disposable {
 			const name = await vscode.window.showInputBox({
 				prompt:      'New branch name',
 				placeHolder: 'feature/my-branch',
-				validateInput: v => /^[a-zA-Z0-9._\-/]+$/.test(v) ? undefined : 'Invalid branch name'
+				validateInput: (v: string) => /^[a-zA-Z0-9._\-/]+$/.test(v) ? undefined : 'Invalid branch name'
 			});
 			if (name) {
 				await vscode.commands.executeCommand('git.branch', name);

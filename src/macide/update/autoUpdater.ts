@@ -140,7 +140,7 @@ export class AutoUpdater implements vscode.Disposable {
 				vscode.window.showInformationMessage(
 					`Macide ${release.version} is available!`,
 					'Install Now', 'Later'
-				).then(choice => {
+				).then((choice: string | undefined) => {
 					if (choice === 'Install Now') this.applyUpdate();
 				});
 			}

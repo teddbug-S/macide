@@ -9,7 +9,7 @@ import * as vscode from 'vscode';
 import * as https from 'https';
 import type { AccountManager } from '../accounts/manager';
 import type { NotificationService } from '../ui/notifications/notificationService';
-import type { MacideAccount } from '../accounts/manager';
+import type { MacideAccount } from '../auth/provider';
 
 const GITHUB_HTTPS_RE  = /^https?:\/\/(?:[^@]+@)?github\.com\//;
 const OWNER_REPO_RE    = /^https?:\/\/(?:[^@]+@)?github\.com\/([^/]+)\/([^/.]+)/;

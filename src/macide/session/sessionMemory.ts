@@ -19,9 +19,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import type { AccountManager } from '../../accounts/manager';
-import type { FlowModeController } from '../flowMode/flowModeController';
-import type { FloatingChatPanel, ChatMessage } from '../floatingChat/floatingChatPanel';
+import type { AccountManager } from '../accounts/manager';
+import type { MacideAccount } from '../auth/provider';
+import type { FlowModeController } from '../ui/flowMode/flowModeController';
+import type { FloatingChatPanel, ChatMessage } from '../ui/floatingChat/floatingChatPanel';
 
 const KEY_ACCOUNT   = 'macide.session.activeAccountId';
 const KEY_FLOWMODE  = 'macide.session.flowModeActive';
@@ -45,7 +46,7 @@ export class SessionMemory implements vscode.Disposable {
 
 		// Save every 2 minutes while idle
 		this._disposables.push(
-			vscode.window.onDidChangeWindowState(s => {
+			vscode.window.onDidChangeWindowState((s: vscode.WindowState) => {
 				if (!s.focused) this._save();
 			})
 		);
@@ -64,7 +65,7 @@ export class SessionMemory implements vscode.Disposable {
 		// Restore active account
 		const accountId = this._context.workspaceState.get<string>(KEY_ACCOUNT);
 		if (accountId) {
-			const account = this._accounts.getAll().find(a => a.id === accountId);
+			const account = this._accounts.getAll().find((a: MacideAccount) => a.id === accountId);
 			if (account) {
 				// Silently restore — don't trigger notifications
 				await this._accounts.setActive(account);

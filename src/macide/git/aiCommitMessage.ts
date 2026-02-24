@@ -88,7 +88,7 @@ export async function generateCommitMessage(context: vscode.ExtensionContext): P
 			title:       'Generating commit message…',
 			cancellable: true
 		},
-		async (_progress, token) => {
+		async (_progress: vscode.Progress<{ message?: string; increment?: number }>, token: vscode.CancellationToken) => {
 			try {
 				const response = await model.sendRequest(messages, {}, token);
 
