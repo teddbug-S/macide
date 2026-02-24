@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Sign in with GitHub](#signin-github)
-- [Accounts authentication](https://github.com/macide/macide/blob/master/docs/accounts-authentication.md)
+- [Accounts authentication](https://github.com/teddbug-S/macide/blob/master/docs/accounts-authentication.md)
 - [How do I run Macide in portable mode?](#portable)
 - [How do I fix the default file manager?](#file-manager)
 - [How do I press and hold a key and have it repeat in Macide?](#press-and-hold)

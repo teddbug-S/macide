@@ -12,7 +12,7 @@
 - [Proprietary Debugging Tools](#proprietary-debugging-tools)
 - [Proprietary Extensions](#proprietary-extensions)
 - [Using the "VSIX Manager" Extension](#vsix-manager)
-- [Extensions compatibility](https://github.com/macide/macide/blob/master/docs/extensions-compatibility.md)
+- [Extensions compatibility](https://github.com/teddbug-S/macide/blob/master/docs/extensions-compatibility.md)
 
 ## <a id="marketplace"></a>Marketplace
 
@@ -90,7 +90,7 @@ Also note that this extension gallery hosts multiple extensions that are non-fre
 
 The debugger provided with Microsoft's [C# extension](https://github.com/OmniSharp/omnisharp-vscode) as well as the (Windows) debugger provided with their [C++ extension](https://github.com/Microsoft/vscode-cpptools) are very restrictively licensed to only work with the official Visual Studio Code build. See [this comment in the C# extension repo](https://github.com/OmniSharp/omnisharp-vscode/issues/2491#issuecomment-418811364) and [this comment in the C++ extension repo](https://github.com/Microsoft/vscode-cpptools/issues/21#issuecomment-248349017).
 
-A workaround exists to get debugging working in C# projects, by using Samsung's opensource [netcoredbg](https://github.com/Samsung/netcoredbg) package. See [this comment](https://github.com/macide/macide/issues/82#issue-409806641) for instructions on how to set that up.
+A workaround exists to get debugging working in C# projects, by using Samsung's opensource [netcoredbg](https://github.com/Samsung/netcoredbg) package. See [this comment](https://github.com/teddbug-S/macide/issues/82#issue-409806641) for instructions on how to set that up.
 
 ## <a id="proprietary-extensions"></a>Proprietary Extensions
 
@@ -109,7 +109,7 @@ In some cases, the above change won't help because the extension is hard-coded t
 
 ## <a id="vsix-manager"></a>Using the "VSIX Manager" Extension
 
-The [**VSIX Manager**](https://github.com/zokugun/vscode-vsix-manager) extension provides a powerful and user-friendly interface for managing `.vsix` files directly within Macide. Its author is the main maintainer of Macide ;)
+The [**VSIX Manager**](https://github.com/zokugun/vscode-vsix-manager) extension provides a powerful and user-friendly interface for managing `.vsix` files directly within Macide.
 
 It is particularly beneficial for:
 - **Support for Multiple Marketplaces**: Seamlessly install and manage extensions from several marketplaces at the same time, allowing access to a broader range of extensions.
@@ -132,5 +132,5 @@ The **VSIX Manager** extension supports managing extensions from several marketp
 - **Enterprise Flexibility**: Use private or self-hosted marketplaces alongside public ones to meet security and compliance requirements.
 - **Custom Configurations**: Prioritize specific marketplaces for particular needs while keeping access to others.
 
-## [Extensions compatibility](https://github.com/macide/macide/blob/master/docs/extensions-compatibility.md)
+## [Extensions compatibility](https://github.com/teddbug-S/macide/blob/master/docs/extensions-compatibility.md)
 

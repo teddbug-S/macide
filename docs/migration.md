@@ -31,7 +31,7 @@ To copy your settings manually:
 
 ## <a id="semi-automatic-migration"></a>Semi-Automatic Migration with "Sync Settings" Extension
 
-The [**Sync Settings**](https://github.com/zokugun/vscode-sync-settings) extension can simplify the migration process by enabling synchronization of settings, keybindings, extensions, and more between Visual Studio Code and Macide. Its author is the main maintainer of Macide ;)
+The [**Sync Settings**](https://github.com/zokugun/vscode-sync-settings) extension can simplify the migration process by enabling synchronization of settings, keybindings, extensions, and more between Visual Studio Code and Macide.
 
 The extension is available in the Visual Studio Marketplace, OpenVSX or directly in its GitHub repository.
 
