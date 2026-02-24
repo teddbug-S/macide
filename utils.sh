@@ -2,9 +2,9 @@
 
 APP_NAME="${APP_NAME:-Macide}"
 APP_NAME_LC="$( echo "${APP_NAME}" | awk '{print tolower($0)}' )"
-ASSETS_REPOSITORY="${ASSETS_REPOSITORY:-macide/macide}"
+ASSETS_REPOSITORY="${ASSETS_REPOSITORY:-teddbug-S/macide}"
 BINARY_NAME="${BINARY_NAME:-macide}"
-GH_REPO_PATH="${GH_REPO_PATH:-macide/macide}"
+GH_REPO_PATH="${GH_REPO_PATH:-teddbug-S/macide}"
 ORG_NAME="${ORG_NAME:-Macide}"
 TUNNEL_APP_NAME="${TUNNEL_APP_NAME:-"${BINARY_NAME}-tunnel"}"
 

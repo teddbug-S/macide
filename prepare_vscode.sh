@@ -48,21 +48,21 @@ setpath "product" "introductoryVideosUrl" "https://go.microsoft.com/fwlink/?link
 setpath "product" "keyboardShortcutsUrlLinux" "https://go.microsoft.com/fwlink/?linkid=832144"
 setpath "product" "keyboardShortcutsUrlMac" "https://go.microsoft.com/fwlink/?linkid=832143"
 setpath "product" "keyboardShortcutsUrlWin" "https://go.microsoft.com/fwlink/?linkid=832145"
-setpath "product" "licenseUrl" "https://github.com/macide/macide/blob/main/LICENSE"
+setpath "product" "licenseUrl" "https://github.com/teddbug-S/macide/blob/main/LICENSE"
 setpath_json "product" "linkProtectionTrustedDomains" '["https://open-vsx.org"]'
-setpath "product" "releaseNotesUrl" "https://github.com/macide/macide/releases"
-setpath "product" "reportIssueUrl" "https://github.com/macide/macide/issues/new"
+setpath "product" "releaseNotesUrl" "https://github.com/teddbug-S/macide/releases"
+setpath "product" "reportIssueUrl" "https://github.com/teddbug-S/macide/issues/new"
 setpath "product" "requestFeatureUrl" "https://go.microsoft.com/fwlink/?LinkID=533482"
 setpath "product" "tipsAndTricksUrl" "https://go.microsoft.com/fwlink/?linkid=852118"
 setpath "product" "twitterUrl" "https://go.microsoft.com/fwlink/?LinkID=533687"
 
 if [[ "${DISABLE_UPDATE}" != "yes" ]]; then
-  setpath "product" "updateUrl" "https://raw.githubusercontent.com/macide/versions/refs/heads/master"
+  setpath "product" "updateUrl" "https://raw.githubusercontent.com/teddbug-S/macide-versions/refs/heads/master"
 
   if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-    setpath "product" "downloadUrl" "https://github.com/macide/macide-insiders/releases"
+    setpath "product" "downloadUrl" "https://github.com/teddbug-S/macide-insiders/releases"
   else
-    setpath "product" "downloadUrl" "https://github.com/macide/macide/releases"
+    setpath "product" "downloadUrl" "https://github.com/teddbug-S/macide/releases"
   fi
 
   # if [[ "${OS_NAME}" == "windows" ]]; then
@@ -270,28 +270,28 @@ if [[ "${OS_NAME}" == "linux" ]]; then
   # fix the packages metadata
   # code.appdata.xml
   sed -i 's|Visual Studio Code|Macide|g' resources/linux/code.appdata.xml
-  sed -i 's|https://code.visualstudio.com/docs/setup/linux|https://github.com/macide/macide#download-install|' resources/linux/code.appdata.xml
-  sed -i 's|https://code.visualstudio.com/home/home-screenshot-linux-lg.png|https://raw.githubusercontent.com/macide/macide/main/icons/stable/macide.png|' resources/linux/code.appdata.xml
-  sed -i 's|https://code.visualstudio.com|https://github.com/macide/macide|' resources/linux/code.appdata.xml
+  sed -i 's|https://code.visualstudio.com/docs/setup/linux|https://github.com/teddbug-S/macide#download-install|' resources/linux/code.appdata.xml
+  sed -i 's|https://code.visualstudio.com/home/home-screenshot-linux-lg.png|https://raw.githubusercontent.com/teddbug-S/macide/main/icons/stable/macide.png|' resources/linux/code.appdata.xml
+  sed -i 's|https://code.visualstudio.com|https://github.com/teddbug-S/macide|' resources/linux/code.appdata.xml
 
   # control.template
-  sed -i 's|Microsoft Corporation <vscode-linux@microsoft.com>|Macide Team https://github.com/macide/macide/graphs/contributors|'  resources/linux/debian/control.template
+  sed -i 's|Microsoft Corporation <vscode-linux@microsoft.com>|Macide Team https://github.com/teddbug-S/macide/graphs/contributors|'  resources/linux/debian/control.template
   sed -i 's|Visual Studio Code|Macide|g' resources/linux/debian/control.template
-  sed -i 's|https://code.visualstudio.com/docs/setup/linux|https://github.com/macide/macide#download-install|' resources/linux/debian/control.template
-  sed -i 's|https://code.visualstudio.com|https://github.com/macide/macide|' resources/linux/debian/control.template
+  sed -i 's|https://code.visualstudio.com/docs/setup/linux|https://github.com/teddbug-S/macide#download-install|' resources/linux/debian/control.template
+  sed -i 's|https://code.visualstudio.com|https://github.com/teddbug-S/macide|' resources/linux/debian/control.template
 
   # code.spec.template
   sed -i 's|Microsoft Corporation|Macide Team|' resources/linux/rpm/code.spec.template
-  sed -i 's|Visual Studio Code Team <vscode-linux@microsoft.com>|Macide Team https://github.com/macide/macide/graphs/contributors|' resources/linux/rpm/code.spec.template
+  sed -i 's|Visual Studio Code Team <vscode-linux@microsoft.com>|Macide Team https://github.com/teddbug-S/macide/graphs/contributors|' resources/linux/rpm/code.spec.template
   sed -i 's|Visual Studio Code|Macide|' resources/linux/rpm/code.spec.template
-  sed -i 's|https://code.visualstudio.com/docs/setup/linux|https://github.com/macide/macide#download-install|' resources/linux/rpm/code.spec.template
-  sed -i 's|https://code.visualstudio.com|https://github.com/macide/macide|' resources/linux/rpm/code.spec.template
+  sed -i 's|https://code.visualstudio.com/docs/setup/linux|https://github.com/teddbug-S/macide#download-install|' resources/linux/rpm/code.spec.template
+  sed -i 's|https://code.visualstudio.com|https://github.com/teddbug-S/macide|' resources/linux/rpm/code.spec.template
 
   # snapcraft.yaml
   sed -i 's|Visual Studio Code|Macide|' resources/linux/rpm/code.spec.template
 elif [[ "${OS_NAME}" == "windows" ]]; then
   # code.iss
-  sed -i 's|https://code.visualstudio.com|https://github.com/macide/macide|' build/win32/code.iss
+  sed -i 's|https://code.visualstudio.com|https://github.com/teddbug-S/macide|' build/win32/code.iss
   sed -i 's|Microsoft Corporation|Macide|' build/win32/code.iss
 fi
 
